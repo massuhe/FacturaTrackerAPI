@@ -1,8 +1,15 @@
-import { Schema, Document, model } from 'mongoose';
-import { NextFunction } from 'express';
+import { Schema, Document, model, Model } from 'mongoose';
 
-export interface IOficina extends Document {
+export interface IOficinaDocument extends Document {
   nombre: string;
+}
+
+/* Declare instance methods */
+export interface IOficina extends IOficinaDocument { }
+
+/* Declare statics methods */
+export interface IOficinaModel extends Model<IOficina> {
+  findAllWithCountReferences: () => Promise<IOficina[]>;
 }
 
 const oficinaSchema = new Schema({
@@ -13,8 +20,8 @@ const oficinaSchema = new Schema({
   },
 }, {
   id: false,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
 });
 
 oficinaSchema.virtual('reglas', {
@@ -35,16 +42,50 @@ oficinaSchema.virtual('usuarios', {
   foreignField: 'oficina'
 });
 
-const autoPopulate = function(next: NextFunction): void {
-  this
-    .populate('usuarios')
-    .populate('reglas')
-    .populate('deudas');
-  next();
+/* Hooks */
+
+/* Aggregates */
+
+/**
+ * Retorna todas las oficinas con la cuenta de cada referencia en lugar de las referencias en sí. El comportamiento es similar a definir
+ * un virtual con la opción de count en true. Sin embargo esta opción no funciona del todo bien, por ese motivo se recurrió a este walkaround.
+ */
+oficinaSchema.statics.findAllWithCountReferences = function() {
+  return this.aggregate([
+    {
+      $lookup: {
+        from: 'reglas',
+        localField: '_id',
+        foreignField: 'oficina',
+        as: 'reglas'
+      }
+    },
+    {
+      $lookup: {
+        from: 'deudas',
+        localField: '_id',
+        foreignField: 'oficina',
+        as: 'deudas'
+      }
+    },
+    {
+      $lookup: {
+        from: 'usuarios',
+        localField: '_id',
+        foreignField: 'oficina',
+        as: 'usuarios'
+      }
+    },
+    {
+      $project: {
+        nombre: 1,
+        reglasCount: { $size: '$reglas' },
+        usuariosCount: { $size: '$usuarios' },
+        deudasCount: { $size: '$deudas' }
+      }
+    }
+  ]);
 }
 
-oficinaSchema.pre('find', autoPopulate);
-oficinaSchema.pre('findOne', autoPopulate);
-
-const Oficina = model<IOficina>('Oficina', oficinaSchema);
+const Oficina = model<IOficina, IOficinaModel>('Oficina', oficinaSchema);
 export default Oficina;

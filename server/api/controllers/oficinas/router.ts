@@ -9,8 +9,6 @@ router
   .get('/:oficina', oficinasController.getById)
   .post('/', catchErrors(oficinasController.create))
   .patch('/:oficina', catchErrors(oficinasController.update))
-  // .get('/:oficina/deudas', oficinasController.getDeudas)
-  // .post('/:oficina/deudas', oficinasController.addDeuda)
-  // .patch('/:oficina/deudas/:deuda', oficinasController.updateDeuda)
+  .delete('/:oficina', catchErrors(oficinasController.delete))
 
 export default router;

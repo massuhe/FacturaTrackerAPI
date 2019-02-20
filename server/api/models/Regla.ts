@@ -4,7 +4,7 @@ import { IOficina } from './Oficina';
 export interface IRegla extends Document {
   descripcion: string;
   prenda: string;
-  oficina: IOficina;
+  oficina: IOficina | string;
 }
 
 const reglaSchema = new Schema({

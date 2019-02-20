@@ -45,6 +45,31 @@ definitions:
       nombre:
         type: string
         example: 5-1
+  ReglaBody:
+    type: object
+    title: regla
+    properties:
+      descripcion:
+        type: string
+        example: Llegar tarde
+      prenda:
+        type: string
+        example: Pagar facturas
+  DeudaBody:
+    type: object
+    title: deuda
+    properties:
+      deudor:
+        type: string
+        example: Id del usuario deudor
+      reglaInflingida:
+        type: string
+        exmaple: Id de la regla inflingida
+      fiscal:
+        type: string
+        example: Id del usuario fiscal
+      fechaPago:
+        type: date
 
 paths:
   # --------- USUARIOS --------- #
@@ -124,7 +149,67 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/OficinaBody"
+    delete:
+      tags:
+        - Oficinas;
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: El id de la oficina a eliminar
+          type: string
   # --------- REGLAS --------- #
+  /oficinas/{id}/reglas:
+    get:
+      tags:
+        - Reglas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la oficina cuyas reglas se recuperarán
+          type: string
+    post:
+      tags:
+        - Reglas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: El id de de la oficina a la que se le agregará la regla
+          type: string
+        - name: regla
+          in: body
+          description: Datos de la regla a agregar
+          required: true
+          schema:
+            $ref: "#/definitions/ReglaBody"
+  # --------- DEUDAS --------- #
+  /oficinas/{id}/deudas:
+    get:
+      tags:
+        - Deudas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la oficina cuyas deudas se recuperarán
+          type: string
+    post:
+      tags:
+        - Deudas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: El id de de la oficina a la que se le agregará la deuda
+          type: string
+        - name: deuda
+          in: body
+          description: Datos de la deuda a agregar
+          required: true
+          schema:
+            $ref: "#/definitions/DeudaBody"
   # /reglas:
   #   get:
   #     tags:

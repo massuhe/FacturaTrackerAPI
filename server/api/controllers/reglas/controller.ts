@@ -10,7 +10,11 @@ export class ReglasController {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-    throw new Error('Method not implemented!!');
+    const oficina = req.params.oficina;
+    const reglaData = req.body;
+    const regla = await ReglasService.create(oficina, reglaData);
+    res.status(STATUS_CODES.CREATED)
+       .json(regla);
   }
 
 }

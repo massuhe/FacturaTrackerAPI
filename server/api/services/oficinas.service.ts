@@ -5,13 +5,16 @@ import removeUndefinedProps from '../../common/utils/removeUndefinedProps';
 class OficinasService {
 
   public async getAll(): Promise<IOficina[]> {
-    return Oficina
-      .find()
-      .exec()
+    return Oficina.findAllWithCountReferences();
   }
 
-  public async getById(idOficina: string): Promise<IOficina> {
-    return Oficina.findById(idOficina);
+  public async getById(id: string): Promise<IOficina> {
+    return Oficina
+      .findById(id)
+      .populate('usuarios')
+      .populate('reglas')
+      .populate('deudas')
+      .lean();
   }
   
   public async create(data: Partial<IOficina>): Promise<IOficina> {
@@ -24,6 +27,10 @@ class OficinasService {
     const oficinaUpdateProps = removeUndefinedProps({nombre: data.nombre});
     const oficinaUpdated = await Oficina.findOneAndUpdate({_id: id}, oficinaUpdateProps, { new: true, runValidators: true });
     return oficinaUpdated;
+  }
+
+  public async delete(id: string): Promise<IOficina> {
+    return Oficina.findOneAndDelete({_id: id});
   }
 
 }

@@ -2,13 +2,14 @@ import { Schema, model, Types, Document } from 'mongoose';
 import { IOficina } from './Oficina';
 import { IUsuario } from './Usuario';
 import { IRegla } from './Regla';
+import { NextFunction } from 'express';
 
 export interface IDeuda extends Document {
   fechaCreacion: Date;
-  deudor: IUsuario;
-  oficina: IOficina;
-  discal?: IUsuario;
-  reglaInflingida?: IRegla;
+  deudor: IUsuario | string;
+  oficina: IOficina | string;
+  reglaInflingida: IRegla | string;
+  fiscal?: IUsuario | string;
   fechaPago?: Date;
 }
 
@@ -38,6 +39,16 @@ const deudaSchema = new Schema({
     required: 'Se debe espeficiar una oficina'
   }
 });
+
+const autoPopulate = function(next: NextFunction) {
+  this.populate('deudor', 'nombre apellido')
+      .populate('fiscal', 'nombre apellido')
+      .populate('reglaInflingida', 'descripcion');
+  next();
+}
+
+deudaSchema.pre('find', autoPopulate);
+deudaSchema.pre('findOne', autoPopulate);
 
 const Deuda = model<IDeuda>('Deuda', deudaSchema);
 export default Deuda;

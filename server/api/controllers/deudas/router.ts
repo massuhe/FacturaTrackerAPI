@@ -2,7 +2,7 @@ import { Router } from 'express';
 import deudasController from './controller';
 import catchErrors from '../../../common/helpers/errorCatcher';
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router.get('/', deudasController.getAll);
 router.post('/', catchErrors(deudasController.create));
