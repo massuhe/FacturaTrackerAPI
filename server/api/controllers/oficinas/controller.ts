@@ -33,7 +33,8 @@ export class OficinasController {
   public async delete(req: Request, res: Response): Promise<void> {
     const idOficina = req.params.oficina;
     await OficinasService.delete(idOficina);
-    res.status(STATUS_CODES.NO_CONTENT).send();
+    res.status(STATUS_CODES.NO_CONTENT)
+       .send();
   }
 
 }

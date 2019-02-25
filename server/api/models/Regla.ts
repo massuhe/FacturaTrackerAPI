@@ -1,11 +1,18 @@
-import { Schema, model, Types, Document } from 'mongoose';
+import { Schema, model, Types, Document, Model } from 'mongoose';
 import { IOficina } from './Oficina';
 
-export interface IRegla extends Document {
+/* Declare document props */
+export interface IReglaDocument extends Document {
   descripcion: string;
   prenda: string;
   oficina: IOficina | string;
 }
+
+/* Declare instance methods */
+export interface IRegla extends IReglaDocument { }
+
+/* Declare statics methods */
+export interface IReglaModel extends Model<IRegla> { }
 
 const reglaSchema = new Schema({
   descripcion: {
@@ -24,5 +31,5 @@ const reglaSchema = new Schema({
   }
 });
 
-const Regla = model<IRegla>('Regla', reglaSchema);
+const Regla = model<IRegla, IReglaModel>('Regla', reglaSchema);
 export default Regla;

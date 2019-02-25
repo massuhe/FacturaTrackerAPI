@@ -1,5 +1,9 @@
 import { Schema, Document, model, Model } from 'mongoose';
+import { NextFunction } from 'express';
+import Deuda from './Deuda';
+import Regla from './Regla';
 
+/* Declare document props */
 export interface IOficinaDocument extends Document {
   nombre: string;
 }
@@ -43,6 +47,15 @@ oficinaSchema.virtual('usuarios', {
 });
 
 /* Hooks */
+
+oficinaSchema.pre('remove', async function(next: NextFunction) {
+  const cascadeDeletePromises = [
+    Deuda.deleteMany({oficina: this._id}).exec(),
+    Regla.deleteMany({oficina: this._id}).exec()
+  ];
+  await Promise.all(cascadeDeletePromises);
+  next();
+});
 
 /* Aggregates */
 

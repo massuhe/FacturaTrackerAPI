@@ -151,7 +151,7 @@ paths:
             $ref: "#/definitions/OficinaBody"
     delete:
       tags:
-        - Oficinas;
+        - Oficinas
       parameters:
         - name: id
           in: path

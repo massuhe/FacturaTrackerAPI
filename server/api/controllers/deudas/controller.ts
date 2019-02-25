@@ -5,8 +5,11 @@ import STATUS_CODES from '../../../common/constants/statusCodes';
 export class DeudasController {
 
   public async getAll(req: Request, res: Response): Promise<void> {
+    const idOficina = req.params.oficina;
+    const idDeuda = req.params.deuda;
     throw new Error('Method not implemented!!');
   }
+  
 
   public async create(req: Request, res: Response): Promise<void> {
     const idOficina = req.params.oficina;

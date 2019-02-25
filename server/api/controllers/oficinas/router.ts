@@ -6,7 +6,7 @@ const router = Router();
 
 router
   .get('/', oficinasController.getAll)
-  .get('/:oficina', oficinasController.getById)
+  .get('/:oficina', catchErrors(oficinasController.getById))
   .post('/', catchErrors(oficinasController.create))
   .patch('/:oficina', catchErrors(oficinasController.update))
   .delete('/:oficina', catchErrors(oficinasController.delete))

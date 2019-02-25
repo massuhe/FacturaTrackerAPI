@@ -1,6 +1,8 @@
 import logger from '../../common/logger'
 import Oficina, { IOficina } from '../models/Oficina';
 import removeUndefinedProps from '../../common/utils/removeUndefinedProps';
+import { CustomError } from '../../common/errors/CustomError';
+import STATUS_CODES from '../../common/constants/statusCodes';
 
 class OficinasService {
 
@@ -9,12 +11,16 @@ class OficinasService {
   }
 
   public async getById(id: string): Promise<IOficina> {
-    return Oficina
+    const oficina = await Oficina
       .findById(id)
       .populate('usuarios')
       .populate('reglas')
       .populate('deudas')
       .lean();
+    if (!oficina) {
+      throw new CustomError('No se ha encontrado la oficina', STATUS_CODES.NOT_FOUND);
+    }
+    return oficina;
   }
   
   public async create(data: Partial<IOficina>): Promise<IOficina> {
@@ -29,8 +35,10 @@ class OficinasService {
     return oficinaUpdated;
   }
 
-  public async delete(id: string): Promise<IOficina> {
-    return Oficina.findOneAndDelete({_id: id});
+  public async delete(id: string): Promise<void> {
+    // return Oficina.findOneAndDelete({_id: id});
+    const oficinaToDelete = await Oficina.findById(id);
+    await oficinaToDelete.remove();
   }
 
 }

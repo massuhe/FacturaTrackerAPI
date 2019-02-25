@@ -1,13 +1,20 @@
-import { Schema, model, Types, Document } from 'mongoose';
+import { Schema, model, Types, Document, Model } from 'mongoose';
 import { isEmail } from 'validator';
 import { IOficina } from './Oficina';
 
-export interface IUsuario extends Document {
+/* Declare document props */
+export interface IUsuarioDocument extends Document {
   nombre: string;
   apellido: string;
   email: string;
   oficina: IOficina | string;
 }
+
+/* Declare instance methods */
+export interface IUsuario extends IUsuarioDocument {}
+
+/* Declare statics methods */
+export interface IUsuarioModel extends Model<IUsuario> {}
 
 const usuarioSchema = new Schema({
   nombre: {
@@ -29,6 +36,6 @@ const usuarioSchema = new Schema({
   }
 });
 
-const Usuario = model<IUsuario>('Usuario', usuarioSchema);
+const Usuario = model<IUsuario, IUsuarioModel>('Usuario', usuarioSchema);
 
 export default Usuario;

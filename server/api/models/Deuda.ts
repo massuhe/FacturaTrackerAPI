@@ -1,10 +1,10 @@
-import { Schema, model, Types, Document } from 'mongoose';
+import { Schema, model, Types, Document, Model } from 'mongoose';
 import { IOficina } from './Oficina';
 import { IUsuario } from './Usuario';
 import { IRegla } from './Regla';
 import { NextFunction } from 'express';
 
-export interface IDeuda extends Document {
+export interface IDeudaDocument extends Document {
   fechaCreacion: Date;
   deudor: IUsuario | string;
   oficina: IOficina | string;
@@ -12,6 +12,10 @@ export interface IDeuda extends Document {
   fiscal?: IUsuario | string;
   fechaPago?: Date;
 }
+
+export interface IDeuda extends IDeudaDocument {}
+
+export interface IDeudaModel extends Model<IDeuda> {}
 
 const deudaSchema = new Schema({
   fechaCreacion: {
@@ -50,5 +54,5 @@ const autoPopulate = function(next: NextFunction) {
 deudaSchema.pre('find', autoPopulate);
 deudaSchema.pre('findOne', autoPopulate);
 
-const Deuda = model<IDeuda>('Deuda', deudaSchema);
+const Deuda = model<IDeuda, IDeudaModel>('Deuda', deudaSchema);
 export default Deuda;
