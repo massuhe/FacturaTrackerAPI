@@ -1,10 +1,11 @@
 import logger from '../../common/logger'
 import Deuda, { IDeuda } from '../models/Deuda';
+import removeUndefinedProps from '../../common/utils/removeUndefinedProps';
 
 class DeudasService {
 
-  public async getAll(): Promise<IDeuda[]> {
-    throw new Error('Method not implemented!!');
+  public async getAll(oficina: string): Promise<IDeuda[]> {
+    return Deuda.find({oficina});
   }
   
   public async create(oficina: string, data: Partial<IDeuda>): Promise<IDeuda> {
@@ -13,6 +14,17 @@ class DeudasService {
     const deuda = new Deuda(deudaData);
     await deuda.save();
     return deuda;
+  }
+
+  public async update(oficina: string, idDeuda: string, data: Partial<IDeuda>): Promise<IDeuda> {
+    const deudaUpdateData = this.getDeudaUpdateProps(data);
+    const newDeuda = await Deuda.findOneAndUpdate({_id: idDeuda, oficina}, deudaUpdateData, { new: true, runValidators: true });
+    return newDeuda;
+  }
+
+  public async delete(oficina: string, idDeuda: string): Promise<void> {
+    const deudaToDelete = await Deuda.findOne({_id: idDeuda, oficina});
+    await deudaToDelete.remove();
   }
 
   /***********
@@ -29,6 +41,11 @@ class DeudasService {
     // - La regla pertenece a la oficina.
     // - El usuario pertenece a la oficina.
     return ;
+  }
+
+  private getDeudaUpdateProps(data: Partial<IDeuda>): Partial<IDeuda> {
+    const { reglaInflingida, fiscal, fechaPago } = data;
+    return removeUndefinedProps({ reglaInflingida, fiscal, fechaPago });
   }
 
 }

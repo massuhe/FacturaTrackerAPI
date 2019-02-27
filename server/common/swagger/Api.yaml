@@ -184,6 +184,42 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/ReglaBody"
+  /oficinas/{oficina}/reglas/{id}:
+    patch:
+      tags:
+        - Reglas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la regla a actualizar
+          type: string
+        - name: oficina
+          in: path
+          required: true
+          description: Id de la oficina que contiene la regla a actualizar
+          type: string
+        - name: regla
+          in: body
+          required: true
+          description: Datos de la regla a actualizar
+          type: object
+          schema:
+            $ref: "#/definitions/ReglaBody"
+    delete:
+      tags:
+        - Reglas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la regla a eliminar
+          type: string
+        - name: oficina
+          in: path
+          required: true
+          description: Id de la oficina que contiene la regla a eliminar
+          type: string
   # --------- DEUDAS --------- #
   /oficinas/{id}/deudas:
     get:
@@ -210,6 +246,42 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/DeudaBody"
+  /oficinas/{oficina}/deudas/{id}:
+    patch:
+      tags:
+        - Deudas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la deuda a actualizar
+          type: string
+        - name: oficina
+          in: path
+          required: true
+          description: Id de la oficina que contiene la deuda a actualizar
+          type: string
+        - name: deuda
+          in: body
+          required: true
+          description: Datos de la deuda a actualizar
+          type: object
+          schema:
+            $ref: "#/definitions/DeudaBody"
+    delete:
+      tags:
+        - Deuda
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Id de la deuda a eliminar
+          type: string
+        - name: oficina
+          in: path
+          required: true
+          description: Id de la oficina que contiene la deuda a eliminar
+          type: string
   # /reglas:
   #   get:
   #     tags:

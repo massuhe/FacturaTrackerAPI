@@ -36,7 +36,6 @@ class OficinasService {
   }
 
   public async delete(id: string): Promise<void> {
-    // return Oficina.findOneAndDelete({_id: id});
     const oficinaToDelete = await Oficina.findById(id);
     await oficinaToDelete.remove();
   }
