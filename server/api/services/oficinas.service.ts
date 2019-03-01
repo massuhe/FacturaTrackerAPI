@@ -13,7 +13,7 @@ class OficinasService {
   public async getById(id: string): Promise<IOficina> {
     const oficina = await Oficina
       .findById(id)
-      .populate('usuarios')
+      .populate('usuarios', undefined, undefined, { activo: true })
       .populate('reglas')
       .populate('deudas')
       .lean();

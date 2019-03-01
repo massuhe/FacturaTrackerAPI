@@ -4,8 +4,11 @@ import catchErrors from '../../../common/helpers/errorCatcher';
 
 const router = Router();
 
-router.get('/', usuariosController.getAll);
-router.post('/', catchErrors(usuariosController.create));
-router.patch('/:usuario', catchErrors(usuariosController.update));
+router
+  .get('/', catchErrors(usuariosController.getAll))
+  .get('/:usuario', catchErrors(usuariosController.getById))
+  .post('/', catchErrors(usuariosController.create))
+  .patch('/:usuario', catchErrors(usuariosController.update))
+  .delete('/:usuario', catchErrors(usuariosController.delete))
 
 export default router;

@@ -91,6 +91,15 @@ paths:
             $ref: "#/definitions/UsuarioBody"
 
   /usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: El id del usuario a recuperar
+          type: string
     patch:
       tags:
         - Usuarios
@@ -106,6 +115,15 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/UsuarioBody"
+    delete:
+      tags:
+        - Usuarios
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: El id del usuario a eliminar
+          type: string
   # --------- OFICINAS --------- #
   /oficinas:
     get:
@@ -282,18 +300,6 @@ paths:
           required: true
           description: Id de la oficina que contiene la deuda a eliminar
           type: string
-  # /reglas:
-  #   get:
-  #     tags:
-  #       - Reglas
-  #     description: Devuelve todas las reglas
-  # --------- DEUDAS --------- #
-  # /deudas:
-  #   get:
-  #     tags:
-  #       - Deudas
-  #     description: Devuelve todas las deudas
-  # --------- SPECS --------- #
   /spec:
     get:
       tags:

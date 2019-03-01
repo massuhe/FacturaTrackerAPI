@@ -13,7 +13,7 @@ export interface IOficina extends IOficinaDocument { }
 
 /* Declare statics methods */
 export interface IOficinaModel extends Model<IOficina> {
-  findAllWithCountReferences: () => Promise<IOficina[]>;
+  findAllWithCountReferences: (activo?: boolean) => Promise<IOficina[]>;
 }
 
 const oficinaSchema = new Schema({
@@ -63,8 +63,9 @@ oficinaSchema.pre('remove', async function(next: NextFunction) {
  * Retorna todas las oficinas con la cuenta de cada referencia en lugar de las referencias en sí. El comportamiento es similar a definir
  * un virtual con la opción de count en true. Sin embargo esta opción no funciona del todo bien, por ese motivo se recurrió a este walkaround.
  */
-oficinaSchema.statics.findAllWithCountReferences = function() {
+oficinaSchema.statics.findAllWithCountReferences = function(activo: boolean = true) {
   return this.aggregate([
+    // Join con reglas
     {
       $lookup: {
         from: 'reglas',
@@ -73,6 +74,7 @@ oficinaSchema.statics.findAllWithCountReferences = function() {
         as: 'reglas'
       }
     },
+    // Join con deudas
     {
       $lookup: {
         from: 'deudas',
@@ -81,14 +83,28 @@ oficinaSchema.statics.findAllWithCountReferences = function() {
         as: 'deudas'
       }
     },
+    // Join con usuarios
     {
       $lookup: {
         from: 'usuarios',
-        localField: '_id',
-        foreignField: 'oficina',
+        let: { oficina: '$_id' },
+        // Incluyo sólo aquellos usuarios que estén activos
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$oficina', '$$oficina'] },
+                  { $eq: ['$activo', activo] },
+                ]
+              }
+            }
+          }
+        ],
         as: 'usuarios'
       }
     },
+    // Al final sólo me quedo con la cantidad de cada recurso
     {
       $project: {
         nombre: 1,

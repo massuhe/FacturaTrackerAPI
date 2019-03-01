@@ -7,7 +7,15 @@ import STATUS_CODES from '../../common/constants/statusCodes';
 class UsuariosService {
 
   public async getAll(): Promise<IUsuario[]> {
-    return Usuario.find();
+    return Usuario.getAll();
+  }
+
+  public async getById(id: string): Promise<IUsuario> {
+    const usuario = await Usuario.getById(id);
+    if (!usuario) {
+      throw new CustomError('No se ha encontrado el usuario', STATUS_CODES.NOT_FOUND);
+    }
+    return usuario;
   }
 
   public async create(data: any): Promise<IUsuario> {
@@ -19,10 +27,14 @@ class UsuariosService {
   }
 
   public async update(id: string, data: any): Promise<IUsuario> {
-    const usuarioUpdateProps = removeUndefinedProps(this.getUsuarioProps(data));
+    const usuarioUpdateProps = this.getUsuarioProps(data);
     await this.validateOficinaChange(id, usuarioUpdateProps);
     const usuarioUpdated = await Usuario.findOneAndUpdate({_id: id}, usuarioUpdateProps, { new: true, runValidators: true });
     return usuarioUpdated;
+  }
+
+  public async delete(id: string): Promise<void> {
+    await Usuario.findOneAndUpdate({_id: id}, { activo: false });
   }
 
   /***********
@@ -31,7 +43,7 @@ class UsuariosService {
 
   private getUsuarioProps(data: any): Partial<IUsuario> {
     const { nombre, apellido, email, oficina } = data;
-    return { nombre, apellido, email, oficina };
+    return removeUndefinedProps({ nombre, apellido, email, oficina });
   }
 
   private validateOficinaChange(id: string, data: Partial<IUsuario>): Promise<any> {
