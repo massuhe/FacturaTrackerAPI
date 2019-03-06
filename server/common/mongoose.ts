@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 
 class Mongoose {
 
-  constructor() {}
-
   public init(): void {
     // Tell mongoose to use new methods instead of those which will be deprecated
     mongoose.set('useCreateIndex', true);

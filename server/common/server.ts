@@ -9,6 +9,8 @@ import swaggerify from './swagger';
 import l from './logger';
 import mongoose from './mongoose';
 import '../api/models/_loadModels';
+import cors from 'cors';
+import passport from './passport';
 
 const app = express();
 
@@ -24,6 +26,8 @@ export default class ExpressServer {
     app.use(bodyParser.urlencoded({ extended: true, limit: process.env.REQUEST_LIMIT || '100kb' }));
     app.use(cookieParser(process.env.SESSION_SECRET));
     app.use(express.static(`${root}/public`));
+    // CORS
+    app.use(cors());
   }
 
   public router(routes: (app: Application) => void): ExpressServer {
@@ -41,6 +45,7 @@ export default class ExpressServer {
     const welcome = port => () => l.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname() } on port: ${port}}`);
     http.createServer(app).listen(p, welcome(p));
     mongoose.init();
+    passport.init(app);
     return app;
   }
 }

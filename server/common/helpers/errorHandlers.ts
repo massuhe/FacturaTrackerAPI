@@ -27,7 +27,7 @@ const validationErrorHandler: ErrorRequestHandler = (err: any, req: Request, res
 
 const customErrorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   if (!(err instanceof CustomError)) {
-    next(err);
+    return next(err);
   }
   const customError = err as CustomError;
   res.status(customError.status)

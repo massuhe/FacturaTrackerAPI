@@ -3,6 +3,7 @@ import removeUndefinedProps from '../../common/utils/removeUndefinedProps';
 import OficinasService from './oficinas.service';
 import { CustomError } from '../../common/errors/CustomError';
 import STATUS_CODES from '../../common/constants/statusCodes';
+import { promisify } from 'es6-promisify';
 
 class UsuariosService {
 
@@ -18,17 +19,15 @@ class UsuariosService {
     return usuario;
   }
 
-  public async create(data: any): Promise<IUsuario> {
-    const usuarioProps = this.getUsuarioProps(data);
-    await this.checkNewOficinaExist(usuarioProps);
-    const newUsuario = new Usuario(usuarioProps);
-    await newUsuario.save();
-    return newUsuario;
+  public async create(data: any): Promise<any> {
+    const usuarioProps = this._getUsuarioProps(data);
+    await this._checkNewOficinaExist(usuarioProps);
+    return this._registerUsuario(usuarioProps, data.password);
   }
 
   public async update(id: string, data: any): Promise<IUsuario> {
-    const usuarioUpdateProps = this.getUsuarioProps(data);
-    await this.validateOficinaChange(id, usuarioUpdateProps);
+    const usuarioUpdateProps = this._getUsuarioProps(data);
+    await this._validateOficinaChange(id, usuarioUpdateProps);
     const usuarioUpdated = await Usuario.findOneAndUpdate({_id: id}, usuarioUpdateProps, { new: true, runValidators: true });
     return usuarioUpdated;
   }
@@ -41,20 +40,27 @@ class UsuariosService {
    * Private *
    ***********/
 
-  private getUsuarioProps(data: any): Partial<IUsuario> {
+  private _getUsuarioProps(data: any): Partial<IUsuario> {
     const { nombre, apellido, email, oficina } = data;
-    return removeUndefinedProps({ nombre, apellido, email, oficina });
+    const usuarioProps: Partial<IUsuario> = { nombre, apellido, email, oficina };
+    return removeUndefinedProps(usuarioProps);
   }
 
-  private validateOficinaChange(id: string, data: Partial<IUsuario>): Promise<any> {
+  private async _registerUsuario(usuario: Partial<IUsuario>, password: string): Promise<any> {
+    const register = promisify(Usuario.register.bind(Usuario, new Usuario(usuario), password));
+    const { _id, nombre, apellido, email }: Partial<IUsuario> = await register();
+    return { _id, nombre, apellido, email };
+  }
+
+  private _validateOficinaChange(id: string, data: Partial<IUsuario>): Promise<any> {
     if (!data.oficina) return ;
     return Promise.all([
-      this.checkNewOficinaExist(data),
-      this.checkDeudasPendientesEnOficina(id, data.oficina as string)
+      this._checkNewOficinaExist(data),
+      this._checkDeudasPendientesEnOficina(id, data.oficina as string)
     ]);
   }
 
-  private async checkNewOficinaExist(data: Partial<IUsuario>): Promise<void> {
+  private async _checkNewOficinaExist(data: Partial<IUsuario>): Promise<void> {
     if (!data.oficina) return ;
     const oficina = await OficinasService.getById(data.oficina as string);
     if (!oficina) {
@@ -62,7 +68,7 @@ class UsuariosService {
     }
   }
 
-  private async checkDeudasPendientesEnOficina(usuario: string, oficina: string): Promise<void> {
+  private async _checkDeudasPendientesEnOficina(usuario: string, oficina: string): Promise<void> {
     // TODO: Validar que no existan deudas con fecha pago null para el usuario en la oficina.
     return ;
   }

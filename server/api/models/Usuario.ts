@@ -1,6 +1,7 @@
 import { Schema, model, Types, Document, Model } from 'mongoose';
 import { isEmail } from 'validator';
 import { IOficina } from './Oficina';
+import passportLocalMongoose from 'passport-local-mongoose';
 
 /* Declare document props */
 export interface IUsuarioDocument extends Document {
@@ -18,6 +19,11 @@ export interface IUsuario extends IUsuarioDocument {}
 export interface IUsuarioModel extends Model<IUsuario> {
   getAll: (activo?: boolean) => IUsuario[];
   getById: (id: string, activos?: boolean) => IUsuario;
+  authenticate: () => any;
+  serializeUser: () => any;
+  deserializeUser: () => any;
+  register: (usuario: IUsuario, password: string, cb: (err: any, account: any) => any) => any;
+  createStrategy: () => any;
 }
 
 const usuarioSchema = new Schema({
@@ -34,6 +40,7 @@ const usuarioSchema = new Schema({
     required: 'Se debe especificar un email',
     validate: [isEmail, 'El formato es inválido']
   },
+  password: String,
   activo: {
     type: Boolean,
     default: true
@@ -44,6 +51,8 @@ const usuarioSchema = new Schema({
   }
 });
 
+/** Hooks */
+
 /** Aggregates */
 
 usuarioSchema.statics.getAll = function(activo: boolean = true) {
@@ -53,6 +62,10 @@ usuarioSchema.statics.getAll = function(activo: boolean = true) {
 usuarioSchema.statics.getById = function(id: string, activo: boolean = true) {
   return this.findOne({ _id: id, activo });
 }
+
+/** Plugins */
+
+usuarioSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 
 const Usuario = model<IUsuario, IUsuarioModel>('Usuario', usuarioSchema);
 
