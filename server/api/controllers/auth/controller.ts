@@ -15,8 +15,8 @@ class AuthController {
       }
       const login = promisify((req as any).login.bind(req, user, { session: false }));
       await login();
-      const token = jwt.sign({ id: user.id, email: user.username}, process.env.JWT_SECRET);
-      return res.json({user: user.username, token});
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+      return res.json({user, token});
     });
     authenticate(req, res);
   }
